@@ -57,15 +57,15 @@ input, select {
     text-align: center;
 }
 
-.success {
-    background: rgba(76, 175, 80, 0.1);
-    color: #4CAF50;
-}
-
-.error {
-    background: rgba(244, 67, 54, 0.1);
-    color: #f44336;
-}
+.status-warning {
+    background-color: #fff7ed;
+    color: #9a3412;
+  }
+  
+  .status-error {
+    background-color: #fef2f2;
+    color: #991b1b;
+  }
 
 #model-section.active {
     display: block !important;
