@@ -33,6 +33,7 @@
       "http://*/*"
     ],
     "permissions": [
+      "storage",
       "tabs"
     ]
   },
