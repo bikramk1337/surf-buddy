@@ -13,7 +13,7 @@ export default function Popup() {
       ) : (
         <div>
           <Header />
-          
+          <p>Summarize search results and chat with Ollama models locally.</p>
           <button
             id="configure"
             className="button-secondary"

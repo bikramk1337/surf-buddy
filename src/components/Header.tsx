@@ -7,7 +7,7 @@ export default function Header() {
         <div className="header">
             <img src={sbIcon} alt="SurfBuddy" />
             <h1>SurfBuddy</h1>
-            <p>Summarize search results and chat with Ollama models locally.</p>
+            {/* <p>Summarize search results and chat with Ollama models locally.</p> */}
         </div>
     )
 }

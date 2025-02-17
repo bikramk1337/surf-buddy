@@ -201,7 +201,7 @@ export default function Config({ onBack, onSave }: ConfigProps) {
           )}
           {connectionState.status === "connected" && (
             <div className="status status-success">
-              Connected to Ollama server
+              Connected to Ollama server!
             </div>
           )}
           {connectionState.error && (
