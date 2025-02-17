@@ -57,15 +57,20 @@ input, select {
     text-align: center;
 }
 
-.status-warning {
-    background-color: #fff7ed;
-    color: #9a3412;
-  }
+.status-success {
+    background-color: #e6ffe6;
+    color: #006600;
+}
   
-  .status-error {
-    background-color: #fef2f2;
-    color: #991b1b;
-  }
+.status-warning {
+    background-color: #fff3e6;
+    color: #804000;
+}
+  
+.status-error {
+    background-color: #ffe6e6;
+    color: #cc0000;
+}
 
 #model-section.active {
     display: block !important;
