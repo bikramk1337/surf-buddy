@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState, useRef } from "react"
 
 import Header from "./Header"
 
@@ -32,18 +32,23 @@ export default function Config({ onBack, onSave }: ConfigProps) {
     "idle"
   )
 
+  // Track initial values for change detection
+  const initialConfig = useRef<OllamaConfig | null>(null)
+
   const isConnectionSuccessful = connectionState.status === "connected"
-  const isSaveDisabled = !isConnectionSuccessful || !selectedModel
+  const hasChanges = initialConfig.current && (
+    initialConfig.current.ollamaUrl !== ollamaUrl ||
+    initialConfig.current.selectedModel !== selectedModel
+  )
+  const isSaveDisabled = !isConnectionSuccessful || !selectedModel || !hasChanges
 
   // Fetch models function
   const fetchOllamaModels = useCallback(
     async (url: string) => {
-      console.log("Fetching models for URL:", url)
       setIsLoading(true)
 
       try {
         const fetchedModels = await fetchModels(url)
-        console.log("Fetched models:", fetchedModels)
         setModels(fetchedModels)
 
         // Handle model selection
@@ -72,16 +77,24 @@ export default function Config({ onBack, onSave }: ConfigProps) {
   useEffect(() => {
     const initializeConfig = async () => {
       try {
-        console.log("Initializing config...")
         const savedConfig = await loadConfigFromStorage()
 
         if (savedConfig) {
-          console.log("Found saved config:", savedConfig)
           setOllamaUrl(savedConfig.ollamaUrl)
           setSelectedModel(savedConfig.selectedModel)
+          initialConfig.current = savedConfig
+        } else {
+          initialConfig.current = {
+            ollamaUrl: DEFAULT_OLLAMA_URL,
+            selectedModel: ""
+          }
         }
       } catch (error) {
         console.error("Error loading config:", error)
+        initialConfig.current = {
+          ollamaUrl: DEFAULT_OLLAMA_URL,
+          selectedModel: ""
+        }
       }
     }
 
@@ -92,13 +105,11 @@ export default function Config({ onBack, onSave }: ConfigProps) {
   useEffect(() => {
     if (!ollamaUrl) return
 
-    console.log("Checking connection for URL:", ollamaUrl)
     const checkOllamaConnection = async () => {
       setConnectionState({ status: "connecting" })
 
       try {
         const isConnected = await checkConnection(ollamaUrl)
-        console.log("Connection check result:", isConnected)
 
         if (isConnected) {
           setConnectionState({ status: "connected" })
@@ -110,7 +121,6 @@ export default function Config({ onBack, onSave }: ConfigProps) {
           })
         }
       } catch (error) {
-        console.error("Connection error:", error)
         setConnectionState({
           status: "failed",
           error:
@@ -127,7 +137,6 @@ export default function Config({ onBack, onSave }: ConfigProps) {
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newUrl = e.target.value.trim()
-    console.log("URL changed to:", newUrl)
     setOllamaUrl(newUrl)
     setConnectionState({ status: "idle" })
     setModels([])
@@ -155,6 +164,7 @@ export default function Config({ onBack, onSave }: ConfigProps) {
 
       await saveConfigToStorage(config)
       setSaveStatus("success")
+      initialConfig.current = config
 
       if (onSave) {
         onSave(config)
@@ -167,17 +177,6 @@ export default function Config({ onBack, onSave }: ConfigProps) {
       alert("Failed to save configuration. Please try again.")
     }
   }
-
-  // Debug logs for state changes
-  useEffect(() => {
-    console.log("Current state:", {
-      ollamaUrl,
-      connectionState,
-      models: models.length,
-      selectedModel,
-      isLoading
-    })
-  }, [ollamaUrl, connectionState, models, selectedModel, isLoading])
 
   return (
     <div className="config-container">
