@@ -1,22 +1,22 @@
 @import 'root.css';
 
-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+.config-container {
+    max-height: 100vh;
+    overflow-y: visible;
 }
 
 .config-section {
-    background: var(--output-bg);
+    background: var(--color-secondary-background);
     padding: 20px;
     border-radius: 8px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--color-border);
     margin-bottom: 20px;
 }
 
 .config-step {
     margin-bottom: 16px;
     padding-bottom: 16px;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--color-border);
 }
 
 .config-step:last-child {
@@ -27,7 +27,7 @@ button:disabled {
 
 .config-step label {
     font-weight: 600;
-    color: var(--text-color);
+    color: var(--color-text);
     margin-bottom: 12px;
 }
 
@@ -35,17 +35,17 @@ label {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: var(--text-color);
+    color: var(--color-text);
 }
 
 input, select {
     width: 100%;
     padding: 8px;
     margin-bottom: 16px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--color-border);
     border-radius: 4px;
-    background: var(--bg-color);
-    color: var(--text-color);
+    background: var(--color-background);
+    color: var(--color-text);
     font-size: 14px;
 }
 
@@ -58,18 +58,18 @@ input, select {
 }
 
 .status-success {
-    background-color: #e6ffe6;
-    color: #006600;
+    background-color: var(--color-status-success-background);
+    color: var(--color-status-success-text);
 }
-  
+
 .status-warning {
-    background-color: #fff3e6;
-    color: #804000;
+    background-color: var(--color-status-warning-background);
+    color: var(--color-status-warning-text);
 }
-  
+
 .status-error {
-    background-color: #ffe6e6;
-    color: #cc0000;
+    background-color: var(--color-status-error-background);
+    color: var(--color-status-error-text);
 }
 
 #model-section.active {
@@ -99,4 +99,5 @@ input, select {
 
 .url-container input {
     width: 100%;
+    box-sizing: border-box;
 }

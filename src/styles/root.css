@@ -1,25 +1,42 @@
 :root {
-    --bg-color: #fff;
-    --text-color: #3D405B;
-    --output-bg: #f8f8fa;
-    --border-color: rgba(61, 64, 91, 0.1);
+    /* Light theme */
+    --color-background: #ffffff;
+    --color-text: #3D405B;
+    --color-accent-primary: #E07A5F; 
+    --color-secondary-background: #f8f8fa; 
+    --color-border: #3D405B1A; 
+    --color-status-success-background: #e6ffe6;
+    --color-status-success-text: #006600;
+    --color-status-warning-background: #fff3e6;
+    --color-status-warning-text: #804000;
+    --color-status-error-background: #ffe6e6;
+    --color-status-error-text: #cc0000;
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --bg-color: #2c2e3e;
-        --text-color: #fff;
-        --output-bg: #3D405B;
-        --border-color: rgba(255, 255, 255, 0.1);
+        /* Dark theme */
+        --color-background: #2c2e3e;
+        --color-text: #ffffff;
+        --color-accent-primary: #E07A5F;
+        --color-secondary-background: #3D405B;
+        --color-border: #ffffff1A; 
+        --color-status-success-background: #e6ffe6;
+        --color-status-success-text: #006600;
+        --color-status-warning-background: #fff3e6;
+        --color-status-warning-text: #804000;
+        --color-status-error-background: #ffe6e6;
+        --color-status-error-text: #cc0000;
     }
 }
+
 
 body {
     width: 300px;
     padding: 16px;
     font-family: Arial, sans-serif;
-    background: var(--bg-color);
-    color: var(--text-color);
+    background: var(--color-background);
+    color: var(--color-text);
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -40,12 +57,12 @@ body {
 .header h1 {
     margin: 0;
     font-size: 25px;
-    color: var(--text-color);
+    color: var(--color-text);
     font-weight: 600;
 }
 
 p {
-    color: var(--text-color);
+    color: var(--color-text);
     opacity: 0.8;
     margin-bottom: 16px;
     text-align: center;
@@ -54,7 +71,7 @@ p {
 button {
     width: 100%;
     padding: 10px;
-    background: #E07A5F;
+    background: var(--color-accent-primary);
     color: white;
     border: none;
     border-radius: 4px;
@@ -68,12 +85,17 @@ button:hover {
     background: #d86c4f;
 }
 
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 .button-secondary {
-    background: var(--output-bg);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
+    background: var(--color-secondary-background);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
 }
 
 .button-secondary:hover {
-    background: var(--border-color);
+    background: var(--color-border);
 }
