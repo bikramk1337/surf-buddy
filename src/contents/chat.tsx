@@ -1,5 +1,6 @@
 import type { PlasmoCSConfig } from "plasmo"
 import { createRoot } from "react-dom/client"
+
 import Chat from "../components/Chat"
 
 export const config: PlasmoCSConfig = {

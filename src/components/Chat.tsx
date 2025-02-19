@@ -1,5 +1,11 @@
-import React, { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 
+import { sendToBackground } from "@plasmohq/messaging"
+
+import type {
+  ChatRequest,
+  ResponseBody
+} from "../background/messages/ollama-chat"
 import { loadConfigFromStorage, type OllamaConfig } from "../utils"
 
 import "../styles/chat.css"
@@ -14,7 +20,7 @@ export default function Chat() {
   const [inputValue, setInputValue] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [config, setConfig] = useState<OllamaConfig | null>(null)
-  
+
   const addMessage = (message: Message) => {
     setMessages((prev) => [...prev, message])
   }
@@ -49,9 +55,18 @@ export default function Chat() {
     addMessage({ type: "user", content: userMessage })
 
     try {
-      const response = "TODO: generate response using Ollama"
-      addMessage({ type: "assistant", content: response})
+      const response = await sendToBackground<ChatRequest, ResponseBody>({
+        name: "ollama-chat",
+        body: {
+          prompt: userMessage,
+          config: config
+        }
+      })
+
+      console.log("Got response:", response)
+      addMessage({ type: "assistant", content: response })
     } catch (error) {
+      console.error("Error in handleSubmit:", error)
       addMessage({
         type: "system",
         content: `Error: ${error instanceof Error ? error.message : "Unknown error occurred"}`

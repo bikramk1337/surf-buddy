@@ -16,6 +16,29 @@ A browser extension for summarizing search results with a local Ollama setup.
 
 First, make sure [Ollama](https://ollama.com/) is configured and running locally.
 
+And enable CORS for the Ollama server [Reference](https://github.com/ollama/ollama/blob/main/docs/faq.md#how-can-i-expose-ollama-on-my-network):
+
+1. Linux
+
+- Run the following command to edit the service configuration:
+
+  ```bash
+  sudo systemctl edit ollama.service
+  ```
+
+- In the opened editor, add the following lines under the [Service] section:
+  ```bash
+  [Service]
+  Environment="OLLAMA_HOST=0.0.0.0:11434"
+  Environment="OLLAMA_ORIGINS='*'"
+  ```
+
+- After editing the configuration, reload the systemd daemon and restart the ollama service:
+  ```bash
+  sudo systemctl daemon-reload
+  sudo systemctl restart ollama.service
+  ```
+
 Then run the development server:
 
 ```bash

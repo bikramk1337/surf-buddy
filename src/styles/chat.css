@@ -30,8 +30,8 @@
 
 .chat-container {
     position: fixed;
-    right: 20px;
-    top: 20px;
+    right: 10px;
+    top: 10px;
     width: 350px;
     height: calc(100vh - 40px);
     background: var(--color-background);
@@ -42,14 +42,6 @@
     flex-direction: column;
     z-index: 1000;
     transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-@media (prefers-color-scheme: dark) {
-    .chat-container {
-        background: var(--color-background);
-        color: var(--color-text);
-        border-color: var(--color-border);
-    }
 }
 
 .chat-header {
