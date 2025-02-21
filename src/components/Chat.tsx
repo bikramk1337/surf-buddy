@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react"
+import sendIcon from "data-base64:../../assets/send-icon.svg"
+import React, { useEffect, useState, useRef } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
 
@@ -20,6 +21,7 @@ const Chat: React.FC = () => {
   const [inputValue, setInputValue] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [config, setConfig] = useState<OllamaConfig | null>(null)
+  const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
   const addMessage = (message: Message) => {
     setMessages((prev) => [...prev, message])
@@ -39,8 +41,17 @@ const Chat: React.FC = () => {
     loadConfig()
   }, [])
 
+  // Auto adjust texttarea height
+  useEffect(() => {
+    const textarea = textAreaRef.current
+    if (textarea) {
+      textarea.style.height = "12px"
+      textarea.style.height = `${textarea.scrollHeight}px`
+    }
+  }, [inputValue])
+
   const handleSubmit = async () => {
-    if (!inputValue.trim() || !config) return
+    if (isLoading || !inputValue.trim() || !config) return
 
     const userMessage = inputValue.trim()
     setInputValue("")
@@ -71,6 +82,14 @@ const Chat: React.FC = () => {
     }
   }
 
+  // Handle input key down
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault()
+      handleSubmit()
+    }
+  }
+
   return (
     <div className="chat-container">
       <div className="chat-header">
@@ -86,21 +105,25 @@ const Chat: React.FC = () => {
       </div>
 
       <div className="chat-input-container">
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-          className="chat-input"
-          placeholder="Ask about the search results..."
-          disabled={!config}
-        />
-        <button
-          onClick={handleSubmit}
-          disabled={isLoading || !config}
-          className="chat-send">
-          Send
-        </button>
+        <div className="chat-input-wrapper">
+          <textarea
+            ref={textAreaRef}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="chat-input"
+            placeholder="Ask about the search results..."
+            disabled={!config}
+          />
+          <button
+            onClick={handleSubmit}
+            disabled={isLoading || !config}
+            className="chat-send"
+            aria-label="Send message"
+            >
+            <img src={sendIcon} alt="Send" />
+          </button>
+        </div>
       </div>
     </div>
   )
