@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
 
@@ -15,7 +15,7 @@ interface Message {
   content: string
 }
 
-export default function Chat() {
+const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -29,18 +29,12 @@ export default function Chat() {
     const loadConfig = async () => {
       const savedConfig = await loadConfigFromStorage()
       setConfig(savedConfig)
-      if (savedConfig) {
-        addMessage({
-          type: "system",
-          content:
-            "Hello! I can help you understand these search results better. What would you like to know?"
-        })
-      } else {
-        addMessage({
-          type: "system",
-          content: "Please configure Ollama settings first."
-        })
-      }
+      addMessage({
+        type: "system",
+        content: savedConfig
+          ? "Hello! I can help you understand these search results better. What would you like to know?"
+          : "Please configure Ollama settings first."
+      })
     }
     loadConfig()
   }, [])
@@ -63,8 +57,9 @@ export default function Chat() {
         }
       })
 
-      console.log("Got response:", response)
-      addMessage({ type: "assistant", content: response })
+      if (response) {
+        addMessage({ type: "assistant", content: response })
+      }
     } catch (error) {
       console.error("Error in handleSubmit:", error)
       addMessage({
@@ -98,7 +93,7 @@ export default function Chat() {
           onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
           className="chat-input"
           placeholder="Ask about the search results..."
-          disabled={isLoading || !config}
+          disabled={!config}
         />
         <button
           onClick={handleSubmit}
@@ -110,3 +105,5 @@ export default function Chat() {
     </div>
   )
 }
+
+export default Chat
