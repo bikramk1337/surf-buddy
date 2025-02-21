@@ -22,6 +22,7 @@ const Chat: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [config, setConfig] = useState<OllamaConfig | null>(null)
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const addMessage = (message: Message) => {
     setMessages((prev) => [...prev, message])
@@ -49,6 +50,11 @@ const Chat: React.FC = () => {
       textarea.style.height = `${textarea.scrollHeight}px`
     }
   }, [inputValue])
+
+  // Scroll to bottom when new message is sent or received
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const handleSubmit = async () => {
     if (isLoading || !inputValue.trim() || !config) return
@@ -102,6 +108,7 @@ const Chat: React.FC = () => {
             {message.content}
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
       <div className="chat-input-container">
