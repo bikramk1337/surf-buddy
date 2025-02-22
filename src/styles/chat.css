@@ -167,11 +167,6 @@
     transition: background 0.2s;
 }
 
-.chat-send img {
-    width: 20px;
-    height: 20px;
-}
-
 .chat-send:hover {
     background: var(--color-accent-primary);
 }

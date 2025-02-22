@@ -1,5 +1,5 @@
-import sendIcon from "data-base64:../../assets/send-icon.svg"
-import React, { useEffect, useState, useRef } from "react"
+import { ArrowUpFromDot } from "lucide-react"
+import React, { useEffect, useRef, useState } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
 
@@ -53,8 +53,8 @@ const Chat: React.FC = () => {
 
   // Scroll to bottom when new message is sent or received
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
 
   const handleSubmit = async () => {
     if (isLoading || !inputValue.trim() || !config) return
@@ -126,9 +126,8 @@ const Chat: React.FC = () => {
             onClick={handleSubmit}
             disabled={isLoading || !config}
             className="chat-send"
-            aria-label="Send message"
-            >
-            <img src={sendIcon} alt="Send" />
+            aria-label="Send message">
+            <ArrowUpFromDot />
           </button>
         </div>
       </div>
