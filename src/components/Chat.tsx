@@ -1,4 +1,4 @@
-import { ArrowUpFromDot } from "lucide-react"
+import { ArrowUpFromDot, Maximize2, Minimize2 } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
@@ -20,6 +20,7 @@ const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isMinimized, setIsMinimized] = useState(false)
   const [config, setConfig] = useState<OllamaConfig | null>(null)
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -97,9 +98,14 @@ const Chat: React.FC = () => {
   }
 
   return (
-    <div className="chat-container">
+    <div className={`chat-container ${isMinimized ? 'minimized' : ''}`}>
       <div className="chat-header">
-        <span className="chat-title">SurfBuddy Chat</span>
+        <span className="chat-title">Surf Buddy</span>
+        <button
+          className="chat-minimize"
+          onClick={() => setIsMinimized(!isMinimized)}>
+          {isMinimized ? <Maximize2 size={20}/> : <Minimize2 size={20} />}
+        </button>
       </div>
 
       <div className="chat-messages">
@@ -127,7 +133,7 @@ const Chat: React.FC = () => {
             disabled={isLoading || !config}
             className="chat-send"
             aria-label="Send message">
-            <ArrowUpFromDot />
+            <ArrowUpFromDot size={18}/>
           </button>
         </div>
       </div>
