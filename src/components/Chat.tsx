@@ -1,12 +1,9 @@
 import { ArrowUpFromDot, Maximize2, Minimize2 } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 
-import { sendToBackground } from "@plasmohq/messaging"
+import { usePort } from "@plasmohq/messaging/hook"
 
-import type {
-  ChatRequest,
-  ResponseBody
-} from "../background/messages/ollama-chat"
+import type { ChatRequest, ResponseBody } from "../background/ports/ollama-chat"
 import { loadConfigFromStorage, type OllamaConfig } from "../utils"
 
 import "../styles/chat.css"
@@ -14,6 +11,7 @@ import "../styles/chat.css"
 interface Message {
   type: "user" | "assistant" | "system"
   content: string
+  isStreaming?: boolean
 }
 
 const Chat: React.FC = () => {
@@ -25,24 +23,40 @@ const Chat: React.FC = () => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
+  const chatPort = usePort<ChatRequest, ResponseBody>("ollama-chat")
+
   const addMessage = (message: Message) => {
     setMessages((prev) => [...prev, message])
   }
 
-  useEffect(() => {
-    const loadConfig = async () => {
-      const savedConfig = await loadConfigFromStorage()
-      setConfig(savedConfig)
-      addMessage({
-        type: "system",
-        content: savedConfig
-          ? "Hello! I can help you understand these search results better. What would you like to know?"
-          : "Please configure Ollama settings first."
-      })
-    }
-    loadConfig()
-  }, [])
+  const updateLastMessage = (content: string) => {
+    setMessages((prev) =>
+      prev.length > 0
+        ? [
+            ...prev.slice(0, -1),
+            {
+              ...prev[prev.length - 1],
+              content: prev[prev.length - 1].content + content
+            }
+          ]
+        : prev
+    )
+  }
 
+  useEffect(() => {
+    loadConfigFromStorage().then((savedConfig) => {
+      setConfig(savedConfig)
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "system",
+          content: savedConfig
+            ? "Hello! I can help you understand these search results better. What would you like to know?"
+            : "Please configure Ollama settings first."
+        }
+      ])
+    })
+  }, [])
   // Auto adjust texttarea height
   useEffect(() => {
     const textarea = textAreaRef.current
@@ -57,6 +71,39 @@ const Chat: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
+  // Set up port message listener
+  useEffect(() => {
+    const handleMessage = (response: ResponseBody) => {
+      setMessages((prev) => {
+        if (response.type === "chunk" && response.content) {
+          return prev.length > 0
+            ? [
+                ...prev.slice(0, -1),
+                {
+                  ...prev[prev.length - 1],
+                  content: prev[prev.length - 1].content + response.content
+                }
+              ]
+            : prev
+        } else if (response.type === "done") {
+          return prev.length > 0
+            ? [
+                ...prev.slice(0, -1),
+                { ...prev[prev.length - 1], isStreaming: false }
+              ]
+            : prev
+        }
+        return prev
+      })
+      if (response.type === "done") {
+        setIsLoading(false)
+      }
+    }
+
+    const { disconnect } = chatPort.listen(handleMessage)
+    return () => disconnect()
+  }, [chatPort])
+
   const handleSubmit = async () => {
     if (isLoading || !inputValue.trim() || !config) return
 
@@ -65,26 +112,19 @@ const Chat: React.FC = () => {
     setIsLoading(true)
 
     addMessage({ type: "user", content: userMessage })
+    addMessage({ type: "assistant", content: "", isStreaming: true })
 
     try {
-      const response = await sendToBackground<ChatRequest, ResponseBody>({
-        name: "ollama-chat",
-        body: {
-          prompt: userMessage,
-          config: config
-        }
+      await chatPort.send({
+        prompt: userMessage,
+        config: config
       })
-
-      if (response) {
-        addMessage({ type: "assistant", content: response })
-      }
     } catch (error) {
       console.error("Error in handleSubmit:", error)
       addMessage({
         type: "system",
         content: `Error: ${error instanceof Error ? error.message : "Unknown error occurred"}`
       })
-    } finally {
       setIsLoading(false)
     }
   }
@@ -98,19 +138,21 @@ const Chat: React.FC = () => {
   }
 
   return (
-    <div className={`chat-container ${isMinimized ? 'minimized' : ''}`}>
+    <div className={`chat-container ${isMinimized ? "minimized" : ""}`}>
       <div className="chat-header">
         <span className="chat-title">Surf Buddy</span>
         <button
           className="chat-minimize"
           onClick={() => setIsMinimized(!isMinimized)}>
-          {isMinimized ? <Maximize2 size={20}/> : <Minimize2 size={20} />}
+          {isMinimized ? <Maximize2 size={20} /> : <Minimize2 size={20} />}
         </button>
       </div>
 
       <div className="chat-messages">
         {messages.map((message, index) => (
-          <div key={index} className={`message message-${message.type}`}>
+          <div
+            key={index}
+            className={`message message-${message.type} ${message.isStreaming ? "streaming" : ""}`}>
             {message.content}
           </div>
         ))}
@@ -133,7 +175,7 @@ const Chat: React.FC = () => {
             disabled={isLoading || !config}
             className="chat-send"
             aria-label="Send message">
-            <ArrowUpFromDot size={18}/>
+            <ArrowUpFromDot size={18} />
           </button>
         </div>
       </div>
