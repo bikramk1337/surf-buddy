@@ -1,5 +1,5 @@
-import sendIcon from "data-base64:../../assets/send-icon.svg"
-import React, { useEffect, useState, useRef } from "react"
+import { ArrowUpFromDot, Maximize2, Minimize2 } from "lucide-react"
+import React, { useEffect, useRef, useState } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
 
@@ -20,8 +20,10 @@ const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isMinimized, setIsMinimized] = useState(false)
   const [config, setConfig] = useState<OllamaConfig | null>(null)
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const addMessage = (message: Message) => {
     setMessages((prev) => [...prev, message])
@@ -49,6 +51,11 @@ const Chat: React.FC = () => {
       textarea.style.height = `${textarea.scrollHeight}px`
     }
   }, [inputValue])
+
+  // Scroll to bottom when new message is sent or received
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
 
   const handleSubmit = async () => {
     if (isLoading || !inputValue.trim() || !config) return
@@ -91,9 +98,14 @@ const Chat: React.FC = () => {
   }
 
   return (
-    <div className="chat-container">
+    <div className={`chat-container ${isMinimized ? 'minimized' : ''}`}>
       <div className="chat-header">
-        <span className="chat-title">SurfBuddy Chat</span>
+        <span className="chat-title">Surf Buddy</span>
+        <button
+          className="chat-minimize"
+          onClick={() => setIsMinimized(!isMinimized)}>
+          {isMinimized ? <Maximize2 size={20}/> : <Minimize2 size={20} />}
+        </button>
       </div>
 
       <div className="chat-messages">
@@ -102,6 +114,7 @@ const Chat: React.FC = () => {
             {message.content}
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
       <div className="chat-input-container">
@@ -119,9 +132,8 @@ const Chat: React.FC = () => {
             onClick={handleSubmit}
             disabled={isLoading || !config}
             className="chat-send"
-            aria-label="Send message"
-            >
-            <img src={sendIcon} alt="Send" />
+            aria-label="Send message">
+            <ArrowUpFromDot size={18}/>
           </button>
         </div>
       </div>
