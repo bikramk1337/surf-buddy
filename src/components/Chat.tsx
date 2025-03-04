@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { usePort } from "@plasmohq/messaging/hook"
 
 import type { ChatRequest, ResponseBody } from "../background/ports/ollama-chat"
-import { loadConfigFromStorage, type OllamaConfig } from "../utils"
+import { loadConfigFromStorage, type OllamaConfig } from "../utils/utils"
 import TypingIndicator from "./TypingIndicator"
 
 import "../styles/chat.css"
@@ -30,20 +30,6 @@ const Chat: React.FC = () => {
     setMessages((prev) => [...prev, message])
   }
 
-  const updateLastMessage = (content: string) => {
-    setMessages((prev) =>
-      prev.length > 0
-        ? [
-            ...prev.slice(0, -1),
-            {
-              ...prev[prev.length - 1],
-              content: prev[prev.length - 1].content + content
-            }
-          ]
-        : prev
-    )
-  }
-
   useEffect(() => {
     loadConfigFromStorage().then((savedConfig) => {
       setConfig(savedConfig)
@@ -58,6 +44,7 @@ const Chat: React.FC = () => {
       ])
     })
   }, [])
+
   // Auto adjust texttarea height
   useEffect(() => {
     const textarea = textAreaRef.current

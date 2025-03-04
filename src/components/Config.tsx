@@ -13,7 +13,7 @@ import {
   type ConnectionState,
   type OllamaConfig,
   type OllamaModel
-} from "../utils"
+} from "../utils/utils"
 
 interface ConfigProps {
   onBack: () => void

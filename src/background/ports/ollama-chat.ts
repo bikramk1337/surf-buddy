@@ -1,6 +1,6 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging"
 
-import { type OllamaConfig } from "../../utils"
+import { type OllamaConfig } from "../../utils/utils"
 
 export interface ChatRequest {
   prompt: string
