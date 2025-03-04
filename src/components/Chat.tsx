@@ -5,6 +5,7 @@ import { usePort } from "@plasmohq/messaging/hook"
 
 import type { ChatRequest, ResponseBody } from "../background/ports/ollama-chat"
 import { loadConfigFromStorage, type OllamaConfig } from "../utils"
+import TypingIndicator from "./TypingIndicator"
 
 import "../styles/chat.css"
 
@@ -153,7 +154,7 @@ const Chat: React.FC = () => {
           <div
             key={index}
             className={`message message-${message.type} ${message.isStreaming ? "streaming" : ""}`}>
-            {message.content}
+            {message.content || (message.isStreaming && <TypingIndicator />)}
           </div>
         ))}
         <div ref={messagesEndRef} />

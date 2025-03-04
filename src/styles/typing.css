@@ -1,0 +1,10 @@
+.typing-indicator {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.dot {
+    display: flex;
+    color: #E07A5F;
+}
